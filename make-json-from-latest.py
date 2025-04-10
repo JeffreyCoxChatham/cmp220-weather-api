@@ -18,21 +18,10 @@ latest = cur.execute("""
 print(latest)
 
 # Turn that tuple into a dict (so that each item has a label)
-latestDict = {
-    'ID': latest[0],
-    'Date': latest[1],
-    'Time': latest[2],
-    'Pm1p0': latest[3],
-    'Pm2p5': latest[4],
-    'Pm4p0': latest[5],
-    'Pm10p0': latest[6],
-    'Humidity': latest[7],
-    'Temp': latest[8],
-    'VocIndex': latest[9],
-    'NoxIndex': latest[10],
-    'CO': latest[11]
-}
-print(latestDict)
+latestDict = {}
+dictLabels = ('ID', 'Date', 'Time', 'Pm1p0', 'Pm2p5', 'Pm4p0', 'Pm10p0', 'Humidity', 'Temp', 'VocIndex', 'NoxIndex', 'CO2')
+for i in range(len(latest)):
+    latestDict[dictLabels[i]] = str(latest[i])
 
 # Turn *that* into json
 latestJson = json.dumps(latestDict, indent=4)
