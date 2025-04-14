@@ -10,7 +10,15 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
         # /records/latest/data.json -> records with latest
         # /predictions/latest/data.json -> predictions with latest
         # /latest/data.json -> records with latest
-        response = self.do_entry('latest', 'records')
+        if self.path.lower().startswith("/records") or self.path.lower().startswith("/predictions"):
+            sheet = self.path.split("/")[1]
+            time = self.path.split("/")[2]
+            response = self.do_entry(sheet, int(time))
+        elif self.path.lower().startswith("/latest"):
+            response = self.do_entry('records', 'latest')
+        else:
+            response = 'i am error'
+        
         self.send_response(200)
         self.send_header('Content-type', 'text/json')
         self.end_headers()
@@ -18,7 +26,7 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
     
     
     # get a specified entry based on a timestamp and a sheet. returns a json dump
-    def do_entry(self, time, sheet):
+    def do_entry(self, sheet, time):
         con = sqlite3.connect("sample-db.db")
         cur = con.cursor()
         
