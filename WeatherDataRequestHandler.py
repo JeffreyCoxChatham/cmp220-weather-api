@@ -19,24 +19,34 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
                 try:
                     time = int(time)
                 except:
-                    response = "Invalid query: provided timestamp must be an integer or 'latest'!"
+                    response = ["Invalid query: provided timestamp must be an integer or 'latest'!", "error"]
                 else:
                     response = self.do_entry(sheet, time)
         elif self.path.lower().startswith("/latest"):
             response = self.do_entry("records", "latest")
         else:
-            response = "Invalid query: malformed path!"
+            response = ["Invalid query: malformed path!", "error"]
         
-        if response == "Invalid query: provided timestamp must be an integer!" or response == "Invalid query: malformed path!" or response == "Invalid query: SQL error!":
-            self.send_response(400)
-            self.send_header("Content-type", "text")
-            self.end_headers()
-            self.wfile.write(response.encode("utf-8"))
-        else:
+        if response[1] == "json":
             self.send_response(200)
             self.send_header("Content-type", "text/json")
             self.end_headers()
-            self.wfile.write(response.encode("utf-8"))
+            self.wfile.write(response[0].encode("utf-8"))
+        elif response[1] == "error":
+            self.send_response(400)
+            self.send_header("Content-type", "text")
+            self.end_headers()
+            self.wfile.write(response[0].encode("utf-8"))
+        elif response[1] == "html":
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(response[0].encode("utf-8"))
+        else:
+            self.send_response(500)
+            self.send_header("Content-type", "text")
+            self.end_headers()
+            self.wfile.write("Unknown error!".encode("utf-8"))
     
     
     # get a specified entry based on a timestamp and a sheet. returns a json dump
@@ -59,7 +69,7 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
                     WHERE Time={time}
                 """).__next__()
         except:
-            return "Invalid query: SQL error!"
+            return ["Invalid query: SQL error!", "error"]
         
         entryDict = {}
         dictLabels = ("ID", "Time", "Pm1p0", "Pm2p5", "Pm4p0", "Pm10p0", "Humidity", "Temp", "VocIndex", "NoxIndex", "CO2")
@@ -68,4 +78,4 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
         entryDict["Sheet"] = sheet
         entryJson = json.dumps(entryDict, indent=4)
         
-        return entryJson
+        return [entryJson, "json"]
