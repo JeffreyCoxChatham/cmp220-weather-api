@@ -14,16 +14,16 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
             sheet = self.path.lower().split("/")[1]
             time = self.path.lower().split("/")[2]
             if time == "latest":
-                response = self.do_entry(sheet, "latest")
+                response = self.getEntry(sheet, "latest")
             else:
                 try:
                     time = int(time)
                 except:
                     response = ["Invalid query: provided timestamp must be an integer or 'latest'!", "error"]
                 else:
-                    response = self.do_entry(sheet, time)
+                    response = self.getEntry(sheet, time)
         elif self.path.lower().startswith("/latest"):
-            response = self.do_entry("records", "latest")
+            response = self.getEntry("records", "latest")
         else:
             response = ["Invalid query: malformed path!", "error"]
         
@@ -50,7 +50,7 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
     
     
     # get a specified entry based on a timestamp and a sheet. returns a json dump
-    def do_entry(self, sheet, time):
+    def getEntry(self, sheet, time):
         con = sqlite3.connect("sample-db.db")
         cur = con.cursor()
         
