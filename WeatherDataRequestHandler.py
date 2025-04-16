@@ -65,6 +65,7 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
         dictLabels = ("ID", "Time", "Pm1p0", "Pm2p5", "Pm4p0", "Pm10p0", "Humidity", "Temp", "VocIndex", "NoxIndex", "CO2")
         for i in range(len(entry)):
             entryDict[dictLabels[i]] = str(entry[i])
+        entryDict["Sheet"] = sheet
         entryJson = json.dumps(entryDict, indent=4)
         
         return entryJson
