@@ -5,11 +5,11 @@ from http.server import BaseHTTPRequestHandler
 class WeatherDataRequestHandler(BaseHTTPRequestHandler):
     
     def do_GET(self):
-        # /records/173856239/data.json -> records with timestamp
-        # /predictions/57363464356/data.json -> predictions with timestamp
-        # /records/latest/data.json -> records with latest
-        # /predictions/latest/data.json -> predictions with latest
-        # /latest/data.json -> records with latest
+        # /records/173856239 -> records with timestamp
+        # /predictions/57363464356 -> predictions with timestamp
+        # /records/latest -> records with latest
+        # /predictions/latest -> predictions with latest
+        # /latest -> records with latest
         if self.path.lower().startswith("/records/") or self.path.lower().startswith("/predictions/"):
             sheet = self.path.lower().split("/")[1]
             time = self.path.lower().split("/")[2]
@@ -47,7 +47,6 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
             self.send_header("Content-type", "text")
             self.end_headers()
             self.wfile.write("Unknown error!".encode("utf-8"))
-    
     
     # get a specified entry based on a timestamp and a sheet. returns a json dump
     def getEntry(self, sheet, time):
