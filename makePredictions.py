@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 def makePrediction():
     con = sqlite3.connect("sample-db.db")
@@ -22,10 +23,10 @@ def makePrediction():
             LIMIT 1
         """).__next__()
     except:
-        lastEntry = (0, 20250326, 1.1, 1.1, 1.1, 1.1, 32.91, 26.37, 103.00, 1.00, 423)
+        lastEntry = (0, 0, 1.1, 1.1, 1.1, 1.1, 32.91, 26.37, 103.00, 1.00, 423)
     
     newID = int(lastID) + 1
-    newTime = int(lastEntry[1]) + 1
+    newTime = time.time()
     newPm1p0 = lastEntry[2]
     newPm2p5 = lastEntry[3]
     newPm4p0 = lastEntry[4]
