@@ -2,7 +2,7 @@ import sqlite3
 import time
 
 def makePrediction():
-    con = sqlite3.connect("sample-db.db")
+    con = sqlite3.connect("AirQualityReadings.db")
     cur = con.cursor()
     
     try:

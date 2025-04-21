@@ -50,7 +50,7 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
     
     # get a specified entry based on a timestamp and a sheet. returns a json dump
     def getEntry(self, sheet, time):
-        con = sqlite3.connect("sample-db.db")
+        con = sqlite3.connect("AirQualityReadings.db")
         cur = con.cursor()
         
         try:

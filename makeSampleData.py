@@ -1,7 +1,7 @@
 import sqlite3
 from makePredictions import makePrediction
 
-con = sqlite3.connect("sample-db.db")
+con = sqlite3.connect("AirQualityReadings.db")
 cur = con.cursor()
 
 cur.execute("""
