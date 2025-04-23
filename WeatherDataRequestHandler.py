@@ -5,14 +5,14 @@ from http.server import BaseHTTPRequestHandler
 class WeatherDataRequestHandler(BaseHTTPRequestHandler):
     
     def do_GET(self):
-        # /records/173856239.6860485 -> records with timestamp
-        # /records/latest -> records with latest
+        # /airQualityReadings/173856239.6860485 -> airQualityReadings with timestamp
+        # /airQualityReadings/latest -> airQualityReadings with latest
         # /latest -> records with latest
-        if self.path.lower().startswith("/airQualityReadings/"):
-            sheet = self.path.lower().split("/")[1]
+        # /prediction -> prediction based on most recent record
+        if self.path.lower().startswith("/airqualityreadings/"):
             time = self.path.lower().split("/")[2]
             if time == "latest":
-                response = self.getEntry(sheet, "latest")
+                response = self.getEntry("latest")
             else:
                 try:
                     time = float(time)
@@ -21,7 +21,7 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
                 else:
                     response = self.getEntry(sheet, time)
         elif self.path.lower().startswith("/latest"):
-            response = self.getEntry("airQualityReadings", "latest")
+            response = self.getEntry("latest")
         else:
             response = ["Invalid query: malformed path!", "error"]
         
@@ -46,8 +46,8 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write("Unknown error!".encode("utf-8"))
     
-    # get a specified entry based on a timestamp and a sheet. returns a json dump
-    def getEntry(self, sheet, time):
+    # get a specified entry based on a timestamp. returns a json dump
+    def getEntry(self, time):
         con = sqlite3.connect("AirQualityReadings.db")
         cur = con.cursor()
         
@@ -55,14 +55,14 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
             if time == "latest":
                 entry = cur.execute(f"""
                     SELECT readingsID, timeStamp, Pm1p0, Pm2p5, Pm4p0, Pm10p0, Humidity, Temp, VocIndex, NoxIndex, CO2
-                    FROM {sheet}
+                    FROM airQualityReadings
                     ORDER BY timeStamp DESC
                     LIMIT 1
                 """).__next__()
             else:
                 entry = cur.execute(f"""
                     SELECT readingsID, timeStamp, Pm1p0, Pm2p5, Pm4p0, Pm10p0, Humidity, Temp, VocIndex, NoxIndex, CO2
-                    FROM {sheet}
+                    FROM airQualityReadings
                     WHERE timeStamp={time}
                 """).__next__()
         except:
@@ -72,7 +72,6 @@ class WeatherDataRequestHandler(BaseHTTPRequestHandler):
         dictLabels = ("readingsID", "timeStamp", "Pm1p0", "Pm2p5", "Pm4p0", "Pm10p0", "Humidity", "Temp", "VocIndex", "NoxIndex", "CO2")
         for i in range(len(entry)):
             entryDict[dictLabels[i]] = str(entry[i])
-        entryDict["Sheet"] = sheet
         entryJson = json.dumps(entryDict, indent=4)
         
         return [entryJson, "json"]
